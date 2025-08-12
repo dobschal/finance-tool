@@ -12,11 +12,13 @@ import CategoriesModal from "./views/CategoriesModal.ts";
 import FilterSelectors from "./views/FilterSelectors.ts";
 import EntriesTable from "./views/EntriesTable.ts";
 import CategoriesStats from "./views/CategoriesStats.ts";
+import SessionSelect from "./views/SessionSelect.ts";
 
 // Modals need to be rendered first...
 ImportModal("#import-modal");
 CategoriesModal("#categories-modal");
 
+SessionSelect("#session-select");
 SessionLoaderView("#session-buttons");
 CategoriesButton("#categories-button");
 ImportButton("#import-button");

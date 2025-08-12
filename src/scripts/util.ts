@@ -2,7 +2,7 @@
 
 import Mustache from "mustache";
 
-export type Optional<T> = T | undefined;
+export type Optional<T> = T | undefined | void;
 
 export type Nullable<T> = T | null;
 
@@ -11,6 +11,14 @@ export function ensure<T>(val: Optional<T> | Nullable<T>): T {
         throw new Error('Fatal Error: Value is null or undefined.');
     }
     return val;
+}
+
+export function lastItem<T>(items: Array<T>): T {
+    return items[items.length - 1];
+}
+
+export function isNonEmptyString(val: unknown): boolean {
+    return typeof val === "string" && val.length > 0;
 }
 
 // endregion
@@ -80,10 +88,30 @@ export function camelCaseToKebabCase(str: string): string {
 // This translates the keys into HTML element IDs and queries them.
 // It returns a proxy that is querying the DOM for the element with the given ID.
 // E.g. UI.importButton becomes document.querySelector("#import-button").
-export function referenceDom<T>(): T & { body: HTMLBodyElement } {
+export function referenceDom<T>(targetId: Optional<string> = undefined): T & { body: HTMLBodyElement } {
+
+    function findElement(root: HTMLElement, key: string): Optional<HTMLElement> {
+        return root.querySelector<HTMLElement>("#" + key) ?? root.querySelector<HTMLElement>(key) ?? undefined;
+    }
+
     return new Proxy({}, {
         get(_, prop: string) {
-            return ensure(document.querySelector<HTMLElement>("#" + camelCaseToKebabCase(prop)) ?? document.querySelector<HTMLElement>(camelCaseToKebabCase(prop)));
+            const key = camelCaseToKebabCase(prop);
+            if(targetId) {
+                const roots = Array.from(document.querySelectorAll(`[data-target="${targetId}"]`));
+                for (const root of roots) {
+                    // check if root itself is the wanted HTMLElement
+                    if(root.id === key || root.tagName.toLowerCase() === key) {
+                        return root;
+                    }
+                    const element = findElement(root as HTMLElement, key);
+                    if (element) {
+                        return element;
+                    }
+                }
+                throw new Error(`Could not find element with id "${key}"`);
+            }
+            return ensure(findElement(document.body, key));
         },
     }) as T & { body: HTMLBodyElement };
 }

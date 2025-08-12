@@ -192,6 +192,7 @@ svg.icon-button {
   border-radius: 50%;
   padding: 0.33rem;
   color: var(--grey-90);
+  overflow: visible;
 
   &:hover {
     cursor: pointer;

@@ -2,14 +2,16 @@ import type {Optional} from "./util.ts";
 import type {Entry} from "./types/Entry.ts";
 import type {Category} from "./types/Category.ts";
 import type {EntryFilter} from "./types/EntryFilter.ts";
+import type {Session} from "./types/Session.ts";
 
 interface Storage {
     entries: Array<Entry>;
     categories: Array<Category>;
     entryFilter: EntryFilter;
+    sessions: Array<Session>;
 }
 
-let updateBounce: Optional<ReturnType<typeof setTimeout>>;
+const updateBounces: Record<string, Optional<ReturnType<typeof setTimeout>>> = {};
 const listeners: Record<string, Array<() => void>> = {};
 
 // Listen to storage changes, Pass "*" as key to listen to all changes
@@ -23,15 +25,14 @@ export function subscribeStore(key: string, callback: () => void): void {
 
 export function store<K extends keyof Storage>(key: K, value: Storage[K]): void {
     window.localStorage.setItem(key, JSON.stringify(value));
-    if (updateBounce) {
-        console.info("Update bounce is already set, clearing it to prevent multiple updates.");
-        clearTimeout(updateBounce);
+    _notify(key);
+}
+
+export function clear<K extends keyof Storage>(...keys: Array<K>): void {
+    for (const key of keys) {
+        window.localStorage.removeItem(key);
+        _notify(key);
     }
-    updateBounce = setTimeout(() => {
-        updateBounce = undefined;
-        const callbacks = (listeners[key] ?? []).concat(listeners["*"] ?? []);
-        callbacks.forEach(callback => callback());
-    });
 }
 
 export function retrieve<K extends keyof Storage>(key: K): Optional<Storage[K]> {
@@ -42,4 +43,16 @@ export function retrieve<K extends keyof Storage>(key: K): Optional<Storage[K]> 
     } catch (e) {
         console.error(`Failed to parse stored value for key "${key}":`, e);
     }
+}
+
+function _notify<K extends keyof Storage>(key: K): void {
+    if (updateBounces[key]) {
+        clearTimeout(updateBounces[key]);
+    }
+    updateBounces[key] = setTimeout(() => {
+        updateBounces[key] = undefined;
+        console.log("Store changed for: ", key);
+        const callbacks = (listeners[key] ?? []).concat(listeners["*"] ?? []);
+        callbacks.forEach(callback => callback());
+    });
 }
