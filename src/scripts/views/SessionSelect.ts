@@ -10,7 +10,7 @@ interface Option {
     selected?: boolean;
 }
 
-export default function(target: string) {
+export default function (target: string) {
 
     const template = `
         <select>
@@ -28,12 +28,12 @@ export default function(target: string) {
 
     function render() {
         const sessions = retrieve("sessions") ?? [];
-        if(sessions.length === 0) {
+        if (sessions.length === 0) {
             const session = addNewEmptySession();
             loadSession(session.id);
         }
         const options = prepareOptions(sessions);
-        updateDom(target, template, { options });
+        updateDom(target, template, {options});
         applyEventListeners();
     }
 
@@ -62,10 +62,10 @@ export default function(target: string) {
     function applyEventListeners() {
         onChange(dom.select, async () => {
             saveCurrentSession();
-            switch(dom.select.value) {
+            switch (dom.select.value) {
                 case "import-session":
                     const session = await importSession();
-                    if(session) {
+                    if (session) {
                         loadSession(session.id);
                     }
                     break;
@@ -90,10 +90,10 @@ export default function(target: string) {
                 try {
                     const text = await file.text();
                     const session: unknown = JSON.parse(text);
-                    if(!session || !isSession(session)) {
+                    if (!session || !isSession(session)) {
                         console.error("Imported session fail is invalid: ", session);
                         alert("The imported file is invalid.");
-                        resolve();
+                        resolve(undefined);
                         return;
                     }
                     saveSession(session);
@@ -101,7 +101,7 @@ export default function(target: string) {
                 } catch (error) {
                     console.error("Failed to parse session data:", error);
                     alert("Failed to upload session data. Please ensure the file is in the correct format.");
-                    resolve();
+                    resolve(undefined);
                 }
             };
             input.click();

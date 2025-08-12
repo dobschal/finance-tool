@@ -2,7 +2,7 @@
 
 import Mustache from "mustache";
 
-export type Optional<T> = T | undefined | void;
+export type Optional<T> = T | undefined;
 
 export type Nullable<T> = T | null;
 
@@ -97,11 +97,11 @@ export function referenceDom<T>(targetId: Optional<string> = undefined): T & { b
     return new Proxy({}, {
         get(_, prop: string) {
             const key = camelCaseToKebabCase(prop);
-            if(targetId) {
+            if (targetId) {
                 const roots = Array.from(document.querySelectorAll(`[data-target="${targetId}"]`));
                 for (const root of roots) {
                     // check if root itself is the wanted HTMLElement
-                    if(root.id === key || root.tagName.toLowerCase() === key) {
+                    if (root.id === key || root.tagName.toLowerCase() === key) {
                         return root;
                     }
                     const element = findElement(root as HTMLElement, key);
