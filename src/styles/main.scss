@@ -72,6 +72,7 @@ button {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  animation: fade-in 0.3s ease-in-out;
 }
 
 dialog {
@@ -83,6 +84,7 @@ dialog {
   padding: 2rem;
   box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
   min-width: 40%;
+  animation: fade-in 0.3s ease-in-out;
 
   form {
     display: flex;
@@ -246,6 +248,7 @@ nav {
   align-items: center;
   justify-content: space-between;
   padding: 0 1rem;
+  animation: move-in-from-top 0.3s ease-in-out;
 }
 
 p {
@@ -283,6 +286,7 @@ table {
     text-align: left;
     border-bottom: 1px solid var(--grey-30);
     min-height: 3rem;
+    animation: fade-in 0.3s ease-in-out;
 
     &:last-child {
       border-right: 1px solid var(--grey-30);

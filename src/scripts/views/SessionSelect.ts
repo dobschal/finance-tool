@@ -29,7 +29,8 @@ export default function(target: string) {
     function render() {
         const sessions = retrieve("sessions") ?? [];
         if(sessions.length === 0) {
-            addNewEmptySession();
+            const session = addNewEmptySession();
+            loadSession(session.id);
         }
         const options = prepareOptions(sessions);
         updateDom(target, template, { options });

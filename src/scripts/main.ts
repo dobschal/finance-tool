@@ -1,9 +1,3 @@
-// import "./views/importModalView.ts";
-// import "./views/categoriesModalView.ts";
-// import "./views/filterSelectView.ts";
-// import "./views/entriesTableView.ts";
-// import "./views/sessionLoaderView.ts";
-
 import SessionLoaderView from "./views/SessionButtons.ts";
 import ImportModal from "./views/ImportModal.ts";
 import CategoriesButton from "./views/CategoriesButton.ts";
@@ -13,8 +7,12 @@ import FilterSelectors from "./views/FilterSelectors.ts";
 import EntriesTable from "./views/EntriesTable.ts";
 import CategoriesStats from "./views/CategoriesStats.ts";
 import SessionSelect from "./views/SessionSelect.ts";
+import Layout from "./views/Layout.ts";
 
-// Modals need to be rendered first...
+// The layout needs to be rendered first
+Layout("#layout");
+
+// Then the modals...
 ImportModal("#import-modal");
 CategoriesModal("#categories-modal");
 

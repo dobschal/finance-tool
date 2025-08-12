@@ -8,3 +8,25 @@
     opacity: 1;
   }
 }
+
+
+@keyframes move-in-from-top {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+@keyframes move-in-from-bottom {
+  from {
+    opacity: 0;
+    transform: translateY(100%);
+  }
+}
+
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
