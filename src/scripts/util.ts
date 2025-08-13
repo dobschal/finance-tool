@@ -71,6 +71,15 @@ export function toDate(date: string): Date {
     return new Date(year, month, day);
 }
 
+const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+export function dateStringToMonthDisplay(date: string): string {
+    const parts = date.split('.');
+    if (parts.length !== 3) throw new Error("Invalid date format: " + date);
+    const month = months[parseInt(parts[1], 10) - 1];
+    return `${month} ${parts[2]}`;
+}
+
 export function toHtmlElements(html: string): Array<Element> {
     const template = document.createElement('template');
     template.innerHTML = html.trim(); // Trim to remove any leading/trailing whitespace

@@ -1,6 +1,6 @@
 import {type Entry} from "../types/Entry.ts";
 import type {Category, CategoryDto} from "../types/Category.ts";
-import {ensure, formatCurrency, type Optional} from "../util.ts";
+import {dateStringToMonthDisplay, ensure, formatCurrency, type Optional} from "../util.ts";
 import {retrieve, store} from "../storage.ts";
 import {getEntriesWithCategories} from "./entryService.ts";
 
@@ -47,7 +47,7 @@ export function saveCategory(category: Category): void {
  */
 export function getCategories(bypassFilter: boolean = false): Array<Category> {
     const entries = getEntriesWithCategories(bypassFilter);
-    const amountOfMonths = new Set(entries.map(entry => entry.date.slice(3))).size;
+    const amountOfMonths = new Set(entries.map(entry => dateStringToMonthDisplay(entry.date))).size;
     const categories: Array<CategoryDto> = retrieve("categories") ?? [];
 
     categories.forEach(category => {

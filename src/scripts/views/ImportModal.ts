@@ -93,21 +93,27 @@ async function importFile(file: File, bankId: string): Promise<void> {
             column.index = -1; // Set to -1 if not found
         }
     });
-
     const lines = fileContent.split("\n").slice(model.startLine - 1);
-    const newEntries: Array<Entry> = lines.filter(line => !!line).map(line => {
-        const columns = line.split(";");
-        const entry: Entry = {
-            date: readStringColumn(CsvColumnType.Date, model.columns, columns),
-            recipientSender: readStringColumn(CsvColumnType.RecipientSender, model.columns, columns),
-            type: readStringColumn(CsvColumnType.Type, model.columns, columns),
-            description: readStringColumn(CsvColumnType.Description, model.columns, columns),
-            balance: readNumberColumn(CsvColumnType.Balance, model.columns, columns),
-            value: readNumberColumn(CsvColumnType.Value, model.columns, columns),
-            currency: readStringColumn(CsvColumnType.Currency, model.columns, columns),
-        };
-        return entry;
-    });
+    const newEntries: Array<Entry> = lines
+        .filter(line => !!line)
+        .map(line => {
+            try {
+                const columns = line.split(";");
+                const entry: Entry = {
+                    date: readStringColumn(CsvColumnType.Date, model.columns, columns),
+                    recipientSender: readStringColumn(CsvColumnType.RecipientSender, model.columns, columns),
+                    type: readStringColumn(CsvColumnType.Type, model.columns, columns),
+                    description: readStringColumn(CsvColumnType.Description, model.columns, columns),
+                    balance: readNumberColumn(CsvColumnType.Balance, model.columns, columns),
+                    value: readNumberColumn(CsvColumnType.Value, model.columns, columns),
+                    currency: readStringColumn(CsvColumnType.Currency, model.columns, columns),
+                };
+                return entry;
+            } catch (error) {
+                console.error("Error while reading:", line, error);
+            }
+        })
+        .filter(e => e) as Array<Entry>;
 
     // Merge with existing entries
     const existingEntries = retrieve("entries") ?? [];

@@ -1,4 +1,4 @@
-import {ensure, onChange, referenceDom, toDate, updateDom} from "../util.ts";
+import {dateStringToMonthDisplay, ensure, onChange, referenceDom, toDate, updateDom} from "../util.ts";
 import {retrieve, store, subscribeStore} from "../storage.ts";
 import type {EntryFilter} from "../types/EntryFilter.ts";
 import {getEntriesWithCategories} from "../service/entryService.ts";
@@ -64,7 +64,7 @@ export default function (target: string) {
             endMonth: "12.3000"
         };
         const monthsSet = new Set<string>();
-        entries.forEach(entry => monthsSet.add(entry.date.slice(3))); // Extract "MM.YYYY" from "DD.MM.YYYY"
+        entries.forEach(entry => monthsSet.add(dateStringToMonthDisplay(entry.date))); // Extract "MM.YYYY" from "DD.MM.YYYY"
         const months = Array
             .from(monthsSet)
             .map(month => {

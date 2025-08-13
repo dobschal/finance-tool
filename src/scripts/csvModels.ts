@@ -34,9 +34,16 @@ export const ingModel: CsvModel = {
     ],
 }
 
-// TODO: Implement the Postbank CSV model
 export const postbankModel: CsvModel = {
-    labelLine: -1,
-    startLine: -1,
-    columns: [],
+    labelLine: 8,
+    startLine: 9,
+    columns: [
+        {index: -1, name: "Buchungstag", type: CsvColumnType.Date},
+        {index: -1, name: "Begünstigter / Auftraggeber", type: CsvColumnType.RecipientSender},
+        {index: -1, name: "Umsatzart", type: CsvColumnType.Type},
+        {index: -1, name: "Verwendungszweck", type: CsvColumnType.Description},
+        {index: -1, name: "Betrag", type: CsvColumnType.Balance},
+        {index: -1, name: "Betrag", type: CsvColumnType.Value},
+        {index: -1, name: "Währung", type: CsvColumnType.Currency},
+    ],
 }
