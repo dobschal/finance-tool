@@ -8,6 +8,11 @@ import EntriesTable from "./views/EntriesTable.ts";
 import CategoriesStats from "./views/CategoriesStats.ts";
 import SessionSelect from "./views/SessionSelect.ts";
 import Layout from "./views/Layout.ts";
+import CategoryEditModal from "./views/CategoryEditModal.ts";
+import {loadState} from "./service/stateService.ts";
+
+// The state, like which modals are open etc. is persisted in the localStorage and URL query
+loadState();
 
 // The layout needs to be rendered first
 Layout("#layout");
@@ -15,6 +20,7 @@ Layout("#layout");
 // Then the modals...
 ImportModal("#import-modal");
 CategoriesModal("#categories-modal");
+CategoryEditModal("#category-edit-modal");
 
 SessionSelect("#session-select");
 SessionLoaderView("#session-buttons");

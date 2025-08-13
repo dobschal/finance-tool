@@ -37,7 +37,7 @@ const template = `
 `;
 
 export default function (target: string) {
-    subscribeStore("*", _render);
+    subscribeStore("entries,categories,entryFilter", _render);
 
     function _render() {
         const entries = getEntriesWithCategories(true);

@@ -54,7 +54,7 @@ const template = `
 
 export default function (target: string) {
 
-    subscribeStore("*", _render);
+    subscribeStore("entryFilter,categories", _render);
 
     function _render(): void {
         const categories = retrieve("categories") ?? [];

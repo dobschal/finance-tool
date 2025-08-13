@@ -1,12 +1,13 @@
 import {type Entry} from "../types/Entry.ts";
 import type {Category, CategoryDto} from "../types/Category.ts";
 import {ensure, formatCurrency, type Optional} from "../util.ts";
-import {retrieve} from "../storage.ts";
+import {retrieve, store} from "../storage.ts";
 import {getEntriesWithCategories} from "./entryService.ts";
 
 export function findCategory(entry: Entry, categories: Array<Category>): Optional<Category> {
     return categories.find(category => {
         function includes(key: string) {
+            if (!key) return false;
             return JSON.stringify(entry).toLowerCase().includes(key.toLowerCase());
         }
 
@@ -17,12 +18,28 @@ export function findCategory(entry: Entry, categories: Array<Category>): Optiona
         try {
             // replace "and" and "or" with their correct logical operations
             const filter = category.filter.replace(/ and /g, " && ").replace(/ or /g, " || ");
-            const filterFn = new Function("entry", "includes", "includesOneOf", `return ${filter}`);
-            return filterFn(entry, includes, includesOneOf);
+            let entryMatches = false;
+            if (filter) {
+                const filterFn = new Function("entry", "includes", "includesOneOf", `return ${filter}`);
+                entryMatches = entryMatches || filterFn(entry, includes, includesOneOf);
+            }
+            if ((category.filterOptions?.includesOneOf?.length ?? 0) > 0) {
+                entryMatches = entryMatches || includesOneOf(...category.filterOptions!.includesOneOf!);
+            }
+            if ((category.filterOptions?.includesAllOf?.length ?? 0) > 0) {
+                entryMatches = entryMatches || category.filterOptions!.includesAllOf!.every(includes);
+            }
+            return entryMatches;
         } catch (error) {
             console.error(`Error evaluating filter for category "${category.name}":`, error);
         }
     });
+}
+
+export function saveCategory(category: Category): void {
+    const categories = (retrieve("categories") ?? []).filter(c => c.id !== category.id);
+    categories.push(category);
+    store("categories", categories);
 }
 
 /**

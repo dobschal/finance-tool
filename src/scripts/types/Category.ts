@@ -3,7 +3,13 @@ export interface Category {
     color: string;
     name: string;
     filter: string;
+    filterOptions?: {
+        includesOneOf?: Array<string>;
+        includesAllOf?: Array<string>;
+    };
+    isExcluded?: boolean;
     isSelected?: boolean;
+    isSelectedForEdit?: boolean;
 }
 
 export interface CategoryDto extends Category {

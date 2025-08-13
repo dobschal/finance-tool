@@ -28,6 +28,7 @@ export default function (target: string) {
             
             <!--#import-modal-->
             <!--#categories-modal-->
+            <!--#category-edit-modal-->
         </main>               
         
         <div id="toast-container">

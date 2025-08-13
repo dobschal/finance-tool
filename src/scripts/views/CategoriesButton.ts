@@ -1,4 +1,5 @@
 import {onClick, referenceDom, updateDom} from "../util.ts";
+import {storeProp} from "../storage.ts";
 
 const template = `
     <button class="secondary" id="categories-button">
@@ -13,13 +14,13 @@ const template = `
 
 const dom = referenceDom<{
     categoriesButton: HTMLElement;
-    categoriesModal: HTMLDialogElement;
 }>();
 
 export default function (target: string) {
     updateDom(target, template);
 
     onClick(dom.categoriesButton, () => {
-        dom.categoriesModal.showModal();
+        storeProp("state", "isCategoriesModalOpen", true);
+        storeProp("state", "isCategoryEditModalOpen", false);
     });
 }
