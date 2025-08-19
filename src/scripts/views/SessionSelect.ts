@@ -1,83 +1,67 @@
-import {onChange, type Optional, referenceDom, updateDom} from "../util.ts";
-import {retrieve, subscribeStore} from "../storage.ts";
+import {ensure, type Optional} from "../lib/util.ts";
 import {isSession, type Session} from "../types/Session.ts";
-import {addNewEmptySession, loadSession, saveCurrentSession, saveSession} from "../service/sessionService.ts";
+import {addNewEmptySession, getSelectedSession, loadSession, saveSession} from "../service/sessionService.ts";
+import {html} from "@dobschal/html.js";
+import {categories, entries, entryFilter, sessions, state} from "../store.ts";
+import {Computed, Observable} from "@dobschal/observable";
+import Select, {type SelectOption} from "./partials/Select.ts";
+import {showToast} from "../lib/toast.ts";
 
-interface Option {
-    id: string;
-    name: string;
-    disabled?: boolean;
-    selected?: boolean;
-}
+export default function () {
 
-export default function (target: string) {
+    const options = Computed(() => prepareOptions(sessions.value));
+    const selectedOptionValue = Observable(state.value.sessionId);
 
-    const template = `
-        <select>
-            {{#options}}
-                <option value="{{id}}" {{#selected}}selected{{/selected}} {{#disabled}}disabled{{/disabled}}>{{name}}</option>
-            {{/options}}
-        </select>
-    `;
+    state.subscribe((state) => {
+        selectedOptionValue.value = state.sessionId;
+    });
 
-    const dom = referenceDom<{
-        select: HTMLSelectElement
-    }>(target);
-
-    subscribeStore("sessions", render);
-
-    function render() {
-        const sessions = retrieve("sessions") ?? [];
-        if (sessions.length === 0) {
-            const session = addNewEmptySession();
-            loadSession(session.id);
-        }
-        const options = prepareOptions(sessions);
-        updateDom(target, template, {options});
-        applyEventListeners();
-    }
-
-    function prepareOptions(sessions: Array<Session>): Array<Option> {
-        const options: Array<Option> = sessions.map((session) => ({
-            id: session.id,
-            name: session.name,
-            selected: session.isSelected
+    function prepareOptions(sessions: Array<Session>): Array<SelectOption> {
+        const options: Array<SelectOption> = sessions.map((session) => ({
+            value: session.id,
+            label: session.name
         }));
         options.push({
-            id: "",
-            name: "",
+            value: "",
+            label: "",
             disabled: true
         });
         options.push({
-            id: "add-new-session",
-            name: "➕ Add New Session"
+            value: "add-new-session",
+            label: "➕ Add New Session"
         });
         options.push({
-            id: "import-session",
-            name: "💾 Import Session"
+            value: "import-session",
+            label: "💾 Import Session"
         });
         return options;
     }
 
-    function applyEventListeners() {
-        onChange(dom.select, async () => {
-            saveCurrentSession();
-            switch (dom.select.value) {
-                case "import-session":
-                    const session = await importSession();
-                    if (session) {
-                        loadSession(session.id);
-                    }
-                    break;
-                case "add-new-session":
-                    loadSession(addNewEmptySession().id);
-                    break;
-                default:
-                    loadSession(dom.select.value);
-
-            }
+    selectedOptionValue.subscribe(async val => {
+        if (!val) return;
+        const currentSession = ensure(getSelectedSession());
+        saveSession({
+            id: currentSession.id,
+            name: currentSession.name,
+            entries: entries.value,
+            categories: categories.value,
+            entryFilter: entryFilter.value
         });
-    }
+        switch (val) {
+            case "import-session":
+                const session = await importSession();
+                if (session) {
+                    loadSession(session.id);
+                }
+                break;
+            case "add-new-session":
+                loadSession(addNewEmptySession().id);
+                break;
+            default:
+                loadSession(val);
+
+        }
+    });
 
     function importSession(): Promise<Optional<Session>> {
         return new Promise(resolve => {
@@ -92,7 +76,7 @@ export default function (target: string) {
                     const session: unknown = JSON.parse(text);
                     if (!session || !isSession(session)) {
                         console.error("Imported session fail is invalid: ", session);
-                        alert("The imported file is invalid.");
+                        showToast("The imported file is invalid.");
                         resolve(undefined);
                         return;
                     }
@@ -107,4 +91,8 @@ export default function (target: string) {
             input.click();
         })
     }
+
+    return html`
+        ${Select(options, selectedOptionValue)}
+    `
 }

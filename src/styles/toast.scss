@@ -1,0 +1,31 @@
+#toast-container {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  transition: height 0.3s ease-in-out;
+
+  .toast {
+    color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: move-in-from-right 0.3s ease-out;
+
+    &.error {
+      background-color: var(--pastel-red-70);
+    }
+
+    &.success {
+      background-color: var(--pastel-green-70);
+    }
+
+    &.info {
+      background-color: var(--pastel-blue-70);
+    }
+  }
+}

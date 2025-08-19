@@ -1,49 +1,65 @@
-import {updateDom} from "../util.ts";
-import {subscribeStore} from "../storage.ts";
-import {getEntriesWithCategories} from "../service/entryService.ts";
+import {html} from "@dobschal/html.js";
+import type {EntryDto} from "../types/Entry.ts";
+import {getEntriesWithCategories, getFilteredEntriesWithCategories} from "../service/entryService.ts";
+import {Computed} from "@dobschal/observable";
+import {entryFilter} from "../store.ts";
 
-const template = `
-    <h2>Entries</h2>
-    <p class="alert"> 
-        <span class="number">{{filteredEntries.length}}</span> 
-        of 
-        <span class="number">{{entries.length}}</span> entries shown.
-        <span class="number">{{entriesWithoutCategory.length}}</span> (!!!) entries without category.
-    </p>
-    <table>
-        <thead>
-        <tr>
-            <th>Date</th>
-            <th>Recipient/Sender</th>
-            <th>Type</th>
-            <th>Description</th>
-            <th class="number">Balance</th>
-            <th class="number">Value</th>
-        </tr>
-        </thead>
-        <tbody>
-            {{#filteredEntries}}
-                <tr {{#category}} style="background-color: {{category.color}};" {{/category}}>
-                    <td class="date">{{date}}</td>
-                    <td class="recipient">{{recipientSender}}</td>
-                    <td class="type">{{type}}</td>
-                    <td class="description">{{description}}</td>
-                    <td class="balance number">{{balanceFormatted}}</td>
-                    <td class="value number">{{valueFormatted}}</td>
+export default function () {
+
+    const entries = Computed(() => getEntriesWithCategories());
+    const filteredEntries = Computed(() => getFilteredEntriesWithCategories().filter(entry => {
+        if (entryFilter.value.hiddenCategories.includes("uncategorized") && !entry.category) {
+            return false;
+        } else if (entry.category?.id && entryFilter.value.hiddenCategories.includes(entry.category.id)) {
+            return false;
+        }
+        return true;
+    }));
+
+    return html`
+        <div class="card">
+            <div class="horizontal space-between">
+                <h2>Entries</h2>
+                <small>
+
+                    ${() => filteredEntries.value.length}
+                    of
+                    ${() => entries.value.length} entries
+                </small>
+            </div>
+            <table>
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Recipient/Sender</th>
+                    <th>Type</th>
+                    <th>Description</th>
+                    <th class="number">Value</th>
                 </tr>
-            {{/filteredEntries}}
-        </tbody>
-    </table>    
-`;
+                </thead>
+                <tbody>
+                ${() => filteredEntries.value.map(TableEntry)}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
 
-export default function (target: string) {
-    subscribeStore("entries,categories,entryFilter", _render);
+function TableEntry(entry: EntryDto) {
 
-    function _render() {
-        const entries = getEntriesWithCategories(true);
-        const filteredEntries = entries.filter(entry => !entry.isHidden);
-        const entriesWithoutCategory = filteredEntries.filter(entry => !entry.category);
-        updateDom(target, template, {filteredEntries, entries, entriesWithoutCategory});
-    }
+    const style = Computed(() => {
+        if (!entry.category?.color) return "";
+        return `background-color: ${entry.category.color}`;
+    });
+
+    return html`
+        <tr style="${style}">
+            <td class="date">${entry.date}</td>
+            <td class="recipient">${entry.recipientSender}</td>
+            <td class="type">${entry.type}</td>
+            <td class="description">${entry.description}</td>
+            <td class="value number">${entry.valueFormatted}</td>
+        </tr>
+    `
 }
 

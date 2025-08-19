@@ -1,11 +1,11 @@
 import {type Entry} from "../types/Entry.ts";
 import type {Category, CategoryDto} from "../types/Category.ts";
-import {dateStringToMonthDisplay, ensure, formatCurrency, type Optional} from "../util.ts";
-import {retrieve, store} from "../storage.ts";
-import {getEntriesWithCategories} from "./entryService.ts";
+import {dateStringToMonthDisplay, ensure, formatCurrency, type Optional} from "../lib/util.ts";
+import {getFilteredEntriesWithCategories} from "./entryService.ts";
+import {categories} from "../store.ts";
 
-export function findCategory(entry: Entry, categories: Array<Category>): Optional<Category> {
-    return categories.find(category => {
+export function findCategoryForEntry(entry: Entry): Optional<Category> {
+    return categories.value.find(category => {
         function includes(key: string) {
             if (!key) return false;
             return JSON.stringify(entry).toLowerCase().includes(key.toLowerCase());
@@ -36,53 +36,60 @@ export function findCategory(entry: Entry, categories: Array<Category>): Optiona
     });
 }
 
-export function saveCategory(category: Category): void {
-    const categories = (retrieve("categories") ?? []).filter(c => c.id !== category.id);
-    categories.push(category);
-    store("categories", categories);
-}
-
-/**
- * @param bypassFilter - if true, the filter for "begin" and "until" months is ignored.
- */
-export function getCategories(bypassFilter: boolean = false): Array<Category> {
-    const entries = getEntriesWithCategories(bypassFilter);
+export function getCategories(): Array<CategoryDto> {
+    const t1 = Date.now();
+    const entries = getFilteredEntriesWithCategories();
     const amountOfMonths = new Set(entries.map(entry => dateStringToMonthDisplay(entry.date))).size;
-    const categories: Array<CategoryDto> = retrieve("categories") ?? [];
+    const sumOfAllEntries = entries.reduce((sum, entry) => sum + entry.value, 0);
 
-    categories.forEach(category => {
-        const e = entries.filter(entry => entry.category?.id === category.id);
-        category.totalBalance = e.reduce((sum, entry) => sum + entry.value, 0);
-        category.totalBalanceFormatted = formatCurrency(category.totalBalance, "EUR");
-        category.averageBalancePerMonth = formatCurrency((category.totalBalance / amountOfMonths) || 0, "EUR");
+    const categoryDtos = categories.value.map(category => {
+        const entriesInCategory = entries.filter(entry => entry.category?.id === category.id);
+        const totalBalance = entriesInCategory.reduce((sum, entry) => sum + entry.value, 0);
+        const categoryDto: CategoryDto = {
+            ...category,
+            totalBalance,
+            totalBalanceFormatted: formatCurrency(totalBalance, "EUR"),
+            averageBalancePerMonth: formatCurrency((totalBalance / amountOfMonths), "EUR"),
+            amountOfEntries: entriesInCategory.length,
+            averageAmountPerMonth: entriesInCategory.length / amountOfMonths,
+            percentOfTotal: totalBalance / sumOfAllEntries,
+        };
+        return categoryDto;
     });
 
     // Remove old "uncategorized" category
-    const uncategorizedIndex = categories.findIndex(category => category.id === "uncategorized");
+    const uncategorizedIndex = categoryDtos.findIndex(category => category.id === "uncategorized");
     if (uncategorizedIndex !== -1) {
-        categories.splice(uncategorizedIndex, 1);
+        categoryDtos.splice(uncategorizedIndex, 1);
     }
 
     // Add category for entries without a category
     const entriesWithoutCategory = entries.filter(entry => !entry.category);
     if (entriesWithoutCategory.length > 0) {
         const totalBalanceForUncategorized = entriesWithoutCategory.reduce((sum, entry) => sum + entry.value, 0);
-        categories.push({
+        categoryDtos.push({
             id: "uncategorized",
             name: "Uncategorized",
-            color: "var(--grey-30)",
+            color: "var(--grey-10)",
             filter: "",
+            filterOptions: {},
             totalBalanceFormatted: formatCurrency(totalBalanceForUncategorized, "EUR"),
             totalBalance: totalBalanceForUncategorized,
             averageBalancePerMonth: formatCurrency((totalBalanceForUncategorized / amountOfMonths) || 0, "EUR"),
+            amountOfEntries: entriesWithoutCategory.length,
+            percentOfTotal: totalBalanceForUncategorized / sumOfAllEntries,
+            averageAmountPerMonth: entriesWithoutCategory.length / amountOfMonths,
+            isExcluded: false,
         });
     }
 
-    categories.sort((a, b) => {
+    categoryDtos.sort((a, b) => {
         const totalBalanceA = ensure(a.totalBalance);
         const totalBalanceB = ensure(b.totalBalance);
         return totalBalanceA - totalBalanceB;
     });
 
-    return categories
+    console.log("Getting categories took: ", Date.now() - t1, "ms");
+
+    return categoryDtos;
 }

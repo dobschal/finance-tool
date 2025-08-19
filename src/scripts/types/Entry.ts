@@ -8,11 +8,11 @@ export interface Entry {
     balance: number;
     value: number;
     currency: string; // e.g. "EUR"
-    isHidden?: boolean; // Optional property to indicate if the entry is filtered out
 }
 
 export interface EntryDto extends Entry {
-    balanceFormatted?: string,
-    valueFormatted?: string,
-    category?: Category
+    balanceFormatted?: string;
+    valueFormatted?: string;
+    category?: Category;
+    isHidden?: boolean;
 }

@@ -1,0 +1,45 @@
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+#splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  z-index: 9999;
+  background-color: rgba(255, 255, 255, 0.33);
+  backdrop-filter: blur(40px);
+  justify-content: center;
+  align-items: center;
+  color: var(--pastel-blue-70);
+  animation: fade-in 0.3s ease-in;
+  transition: background-color 0.3s ease-in-out, backdrop-filter 0.3s ease-in-out;
+}
+
+#splash-screen h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--pastel-blue-70);
+  background: -webkit-linear-gradient(150deg, var(--pastel-blue-50) 0%, var(--pastel-blue-70) 10%, var(--pastel-blue-90));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: opacity 0.2s ease-in-out 0.1s;
+}
+
+#splash-screen.fade-out {
+  background-color: rgba(255, 255, 255, 0);
+  backdrop-filter: blur(0px);
+  color: rgba(255, 255, 255, 0);
+
+  h1 {
+    opacity: 0;
+  }
+}

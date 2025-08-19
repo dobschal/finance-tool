@@ -1,12 +1,11 @@
 import type {Entry} from "./Entry.ts";
 import type {Category} from "./Category.ts";
 import type {EntryFilter} from "./EntryFilter.ts";
-import {isNonEmptyString} from "../util.ts";
+import {isNonEmptyString} from "../lib/util.ts";
 
 export interface Session {
     id: string;
     name: string;
-    isSelected: boolean;
     entries: Array<Entry>,
     categories: Array<Category>,
     entryFilter: EntryFilter,

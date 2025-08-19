@@ -3,18 +3,19 @@ export interface Category {
     color: string;
     name: string;
     filter: string;
-    filterOptions?: {
+    filterOptions: {
         includesOneOf?: Array<string>;
         includesAllOf?: Array<string>;
     };
-    isExcluded?: boolean;
-    isSelected?: boolean;
-    isSelectedForEdit?: boolean;
+    isExcluded: boolean;
+    isSelectedForEdit?: boolean; // TODO: move to state
 }
 
 export interface CategoryDto extends Category {
-    averageBalancePerMonth?: string;
-    totalBalance?: number;
-    totalBalanceFormatted?: string;
-    percentOfTotal?: number;
+    averageBalancePerMonth: string;
+    totalBalance: number;
+    totalBalanceFormatted: string;
+    percentOfTotal: number;
+    amountOfEntries: number;
+    averageAmountPerMonth: number;
 }

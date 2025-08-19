@@ -1,66 +1,65 @@
-import {ensure, onClick, onSubmit, referenceDom, showToast, toDate, updateDom} from "../util.ts";
+import {ensure, type Optional, toDate} from "../lib/util.ts";
 import {type CsvColumn, CsvColumnType, type CsvModel, ingModel, postbankModel} from "../csvModels.ts";
-import {retrieve, store} from "../storage.ts";
+import {entries, entryFilter, state} from "../store.ts";
 import type {Entry} from "../types/Entry.ts";
+import {html} from "@dobschal/html.js";
+import {showToast} from "../lib/toast.ts";
 
 // region setup
 
-const dom = referenceDom<{
-    importModalCancelButton: HTMLButtonElement;
-    importModal: HTMLDialogElement;
-    importForm: HTMLFormElement;
-    importFileInput: HTMLInputElement;
-    importBankSelect: HTMLSelectElement;
-}>();
+export default function () {
 
-const template = `
-    <dialog id="import-modal">
-        <form id="import-form">
-            <h2>Import Data</h2>
-            <p class="alert">
-                The app expects german formats for dates and numbers. E.g. "31.01.2023" for dates and "1.234,56" for
-                numbers.
-            </p>
-            <label for="import-bank-select">Select Institute:</label>
-            <select name="bank-select" id="import-bank-select">
-                <option value="ing" selected>ING</option>
-                <option value="postbank">Postbank</option>
-            </select>
-            <label for="import-file-input">Select File:</label>
-            <input type="file" id="import-file-input" accept=".csv"/>
-            <div class="button-group">
-                <button type="submit">Import</button>
-                <button type="button" class="secondary" id="import-modal-cancel-button">Cancel</button>
-            </div>
-        </form>
-    </dialog>
-`;
+    let bankId = "ing";
+    let file: Optional<File>;
 
-export default function (target: string) {
+    function close() {
+        state.value.isImportModalOpen = false;
+    }
 
-    updateDom(target, template);
+    function onSelectBank(event: Event) {
+        bankId = (event.target as HTMLSelectElement).value;
+    }
 
-    onClick(dom.importModalCancelButton, () => {
-        dom.importModal.close();
-    });
+    function onFileChange(event: Event) {
+        file = (event.target as HTMLInputElement).files?.[0];
+    }
 
-    onSubmit(dom.importForm, async () => {
-        const file = dom.importFileInput.files?.[0];
+    async function onSubmit(event: SubmitEvent) {
+        event.preventDefault();
         if (!file) {
             alert("Please select a file to import.");
             return;
         }
-
-        const bankId = dom.importBankSelect.value;
         if (!bankId) {
             alert("Please select a bank to import the file into.");
             return;
         }
-
         await importFile(file, bankId);
+        close();
+    }
 
-        dom.importModal.close();
-    });
+    return html`
+        <dialog ${() => state.value.isImportModalOpen ? "open" : ""}>
+            <form onsubmit="${onSubmit}">
+                <h2>Import Data</h2>
+                <p class="alert">
+                    The app expects german formats for dates and numbers. E.g. "31.01.2023" for dates and "1.234,56" for
+                    numbers.
+                </p>
+                <label for="import-bank-select">Select Institute:</label>
+                <select name="bank-select" onchange="${onSelectBank}">
+                    <option value="ing" selected>ING</option>
+                    <option value="postbank">Postbank</option>
+                </select>
+                <label for="import-file-input">Select File:</label>
+                <input type="file" onchange="${onFileChange}" accept=".csv"/>
+                <div class="button-group">
+                    <button type="submit">Import</button>
+                    <button type="button" class="secondary" onclick="${close}">Cancel</button>
+                </div>
+            </form>
+        </dialog>
+    `;
 }
 
 // endregion
@@ -116,7 +115,7 @@ async function importFile(file: File, bankId: string): Promise<void> {
         .filter(e => e) as Array<Entry>;
 
     // Merge with existing entries
-    const existingEntries = retrieve("entries") ?? [];
+    const existingEntries = entries.value;
     const existingEntriesKeys = new Set(existingEntries.map(entry => entry.date + entry.recipientSender + entry.value + entry.description));
     const uniqueEntries = newEntries.filter(entry => {
         const entryKey = entry.date + entry.recipientSender + entry.value + entry.description;
@@ -132,13 +131,13 @@ async function importFile(file: File, bankId: string): Promise<void> {
         return dateB.getTime() - dateA.getTime();
     });
 
-    store("entryFilter", {
+    entryFilter.value = {
         startMonth: "01.1970",
         endMonth: "12.3000",
         includeEarnings: false,
-        categoryId: "",
-    });
-    store("entries", allEntries);
+        hiddenCategories: []
+    };
+    entries.value = allEntries;
 }
 
 function readStringColumn(type: CsvColumnType, columns: Array<CsvColumn>, values: Array<string>): string {

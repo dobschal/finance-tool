@@ -1,7 +1,7 @@
 {
   "name": "finance-tool",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,12 +9,12 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@types/mustache": "^4.2.6",
     "sass-embedded": "^1.90.0",
     "typescript": "~5.8.3",
     "vite": "^7.1.0"
   },
   "dependencies": {
-    "mustache": "^4.2.0"
+    "@dobschal/html.js": "1.0.6",
+    "@dobschal/observable": "1.0.5"
   }
 }

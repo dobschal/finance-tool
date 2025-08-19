@@ -1,7 +1,16 @@
-import {updateDom} from "../util.ts";
+import {html} from "@dobschal/html.js";
+import CategoriesModal from "./CategoriesModal.ts";
+import CategoryEditModal from "./CategoryEditModal.ts";
+import EntriesTable from "./EntriesTable.ts";
+import ImportButton from "./ImportButton.ts";
+import ImportModal from "./ImportModal.ts";
+import CategoriesStats from "./Categories.ts";
+import FilterSelectors from "./FilterSelectors.ts";
+import SessionButtons from "./SessionButtons.ts";
+import SessionSelect from "./SessionSelect.ts";
 
-export default function (target: string) {
-    const template = `
+export default function (): Array<HTMLElement> {
+    return <Array<HTMLElement>>html`
         <nav>
             <div class="horizontal">
                 <h1>
@@ -12,28 +21,27 @@ export default function (target: string) {
                     </svg>
                     Organize Cash
                 </h1>
-                <!--#categories-button-->
-                <!--#session-select-->
             </div>
             <div class="button-group">
-                <!--#session-buttons-->
-                <!--#import-button-->
+                ${ImportButton()}
             </div>
         </nav>
-        
-        <main>
-            <!--#filter-selectors-->
-            <!--#categories-stats-->
-            <!--#entries-table-->
-            
-            <!--#import-modal-->
-            <!--#categories-modal-->
-            <!--#category-edit-modal-->
-        </main>               
-        
-        <div id="toast-container">
-        </div>
-    `;
 
-    updateDom(target, template);
+        <main>
+            <div class="horizontal">
+                ${SessionSelect()}
+                ${SessionButtons()}
+            </div>
+            ${FilterSelectors()}
+            ${CategoriesStats()}
+            ${EntriesTable()}
+        </main>
+        
+        ${CategoriesModal()}
+        ${ImportModal()}
+        ${CategoryEditModal()}
+
+    `;
 }
+
+
