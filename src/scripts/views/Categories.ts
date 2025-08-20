@@ -79,7 +79,8 @@ function CategoryCircleBadge(c: CategoryDto) {
             <span>${c.name}</span>
             <b>${() => state.value.isAverageShown ? c.averageBalancePerMonth : c.totalBalanceFormatted}</b>
             <small>${() => state.value.isAverageShown ? "per Month" : "Total"}
-                    (${() => state.value.isAverageShown ? c.averageAmountPerMonth : c.amountOfEntries})</small>
+                    (${() => state.value.isAverageShown ? Math.round(c.averageAmountPerMonth) : c.amountOfEntries}
+                    )</small>
         </div>
     `;
 }
