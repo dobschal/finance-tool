@@ -46,6 +46,22 @@
   }
 }
 
+.color-circle {
+  width: 1.5rem;
+  height: 1.5rem;
+  max-width: 1.5rem;
+  max-height: 1.5rem;
+  min-width: 1.5rem;
+  min-height: 1.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.3s ease-in-out;
+
+  &.selected {
+    border: dotted 2px var(--grey-90);
+  }
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -69,6 +85,14 @@
   flex-direction: row;
   gap: 1rem;
   align-items: center;
+
+  &.wrap {
+    flex-wrap: wrap;
+  }
+
+  &.tight {
+    gap: 0.5rem;
+  }
 
   &.wide {
     gap: 2rem;

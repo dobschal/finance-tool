@@ -1,9 +1,13 @@
-import {categories, entries, state} from "../store.ts";
+import {categories, entries, state} from "../../store.ts";
 import {html} from "@dobschal/html.js";
-import type {CategoryDto} from "../types/Category.ts";
-import {getCategories} from "../service/categoryService.ts";
+import type {CategoryDto} from "../../types/Category.ts";
+import {getCategories} from "../../service/categoryService.ts";
+import Modal from "./Modal.ts";
+import {bind} from "../../lib/util.ts";
 
 export default function () {
+
+    const isOpen = bind(state, "isCategoriesModalOpen");
 
     function onAddCategoryModal() {
         categories.value.forEach(c => c.isSelectedForEdit = false);
@@ -15,23 +19,18 @@ export default function () {
         state.value.isCategoriesModalOpen = false;
     }
 
-    return html`
-        <dialog ${() => state.value.isCategoriesModalOpen ? "open" : "shown"}>
-            <div class="vertical">
-                <h2>Categories</h2>
-                <p class="alert info">
-                    For ${entries.value.length} entries, ${categories.value.length} categories are defined.
-                </p>
-                <ul>
-                    ${() => getCategories().map(ListItem)}
-                </ul>
-                <div class="button-group">
-                    <button onclick="${onAddCategoryModal}">Add Category</button>
-                    <button onclick="${close}" class="secondary">Close</button>
-                </div>
-            </div>
-        </dialog>
-    `;
+    return Modal(isOpen, "Categories", html`
+        <p class="alert info">
+            For ${entries.value.length} entries, ${categories.value.length} categories are defined.
+        </p>
+        <ul>
+            ${() => getCategories().map(ListItem)}
+        </ul>
+        <div class="button-group">
+            <button onclick="${onAddCategoryModal}">Add Category</button>
+            <button onclick="${close}" class="secondary">Close</button>
+        </div>
+    `);
 }
 
 function ListItem({name, color, averageBalancePerMonth, totalBalanceFormatted, id}: CategoryDto) {

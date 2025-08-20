@@ -1,9 +1,10 @@
 import {html} from "@dobschal/html.js";
-import {categories, state} from "../store.ts";
+import {categories, state} from "../../store.ts";
 import {Observable} from "@dobschal/observable";
-import Select, {type SelectOption} from "./partials/Select.ts";
-import {toArray} from "../lib/util.ts";
-import Checkbox from "./partials/Checkbox.ts";
+import {type SelectOption} from "../partials/Select.ts";
+import {bind, toArray} from "../../lib/util.ts";
+import Checkbox from "../partials/Checkbox.ts";
+import Modal from "./Modal.ts";
 
 export default function () {
 
@@ -26,6 +27,7 @@ export default function () {
         {value: "var(--grey-10)", label: "Grey 30"}
     ];
 
+    const isOpen = bind(state, "isCategoryEditModalOpen");
     const id = Observable("");
     const name = Observable("");
     const color = Observable("");
@@ -33,7 +35,6 @@ export default function () {
     const includesOneOf = Observable("");
     const includesAllOf = Observable("");
     const isExcluded = Observable(false);
-
     const shownTab = Observable(1);
 
     state.subscribe((state) => {
@@ -88,66 +89,69 @@ export default function () {
         state.value.isCategoriesModalOpen = false;
     }
 
-    return html`
-        <dialog ${() => state.value.isCategoryEditModalOpen ? "open" : ""}>
-            <form onsubmit="${onSubmit}">
-                <h2>Category Information</h2>
-                <div class="form-group">
-                    <label for="name-input">Name:</label>
-                    <input type="text" value="${name}"/>
+    return Modal(isOpen, "Category Information", html`
+        <form onsubmit="${onSubmit}">
+            <div class="form-group">
+                <label for="name-input">Name:</label>
+                <input type="text" value="${name}"/>
+            </div>
+            <div class="form-group">
+                <label for="color-input">Color:</label>
+                <div class="horizontal tight wrap">
+                    ${() => colors.map(c => html`
+                        <div onclick="${() => color.value = c.value}"
+                             class="color-circle ${color.value === c.value ? "selected" : ""}"
+                             style="background-color: ${() => c.value}">
+                    `)}
                 </div>
-                <div class="form-group">
-                    <label for="color-input">Color:</label>
-                    ${Select(colors, color)}
-                </div>
-                <div class="form-group">
-                    <label for="exclude-category-checkbox">Exclude Category:</label>
-                    ${Checkbox(isExcluded)}
-                </div>
-                <div class="tabs">
-                    <button type="button"
-                            class="${() => shownTab.value !== 1 ? "secondary" : "primary"}"
-                            onclick="${() => shownTab.value = 1}">
-                        Easy
-                    </button>
-                    <button type="button"
-                            class="${() => shownTab.value !== 2 ? "secondary" : "primary"}"
-                            onclick="${() => shownTab.value = 2}">
-                        Custom
-                    </button>
-                </div>
+            </div>
+            <div class="form-group">
+                <label for="exclude-category-checkbox">Exclude Category:</label>
+                ${Checkbox(isExcluded)}
+            </div>
+            <div class="tabs">
+                <button type="button"
+                        class="${() => shownTab.value !== 1 ? "secondary" : "primary"}"
+                        onclick="${() => shownTab.value = 1}">
+                    Easy
+                </button>
+                <button type="button"
+                        class="${() => shownTab.value !== 2 ? "secondary" : "primary"}"
+                        onclick="${() => shownTab.value = 2}">
+                    Custom
+                </button>
+            </div>
 
-                <div class="form-group ${() => shownTab.value !== 1 ? "hidden" : "shown"}">
-                    <label for="includes-one-of-input">
-                        Includes One Of (separated by comma):
-                    </label>
-                    <input type="text"
-                           placeholder="REWE, Globus, Edeka, Kaufland..."
-                           value="${includesOneOf}">
-                </div>
-                <div class="form-group ${() => shownTab.value !== 1 ? "hidden" : "shown"}">
-                    <label for="includes-all-of-input">
-                        Includes All Of (separated by comma):
-                    </label>
-                    <input type="text"
-                           placeholder="Max Mustermann, Geschenk..."
-                           value="${includesAllOf}">
-                </div>
-                <div class="form-group ${() => shownTab.value !== 2 ? "hidden" : "shown"}">
-                    <label for="custom-filter-textarea">
-                        Custom Filter:
-                    </label>
-                    <textarea class="code"
-                              rows="12"
-                              value="${filter}"
-                              placeholder="Custom JavaScript code to filter entries...">
-                    </textarea>
-                </div>
-                <div class="button-group">
-                    <button type="submit">Save Category</button>
-                    <button type="button" class="secondary" onclick="${close}">Cancel</button>
-                </div>
-            </form>
-        </dialog>
-    `
+            <div class="form-group ${() => shownTab.value !== 1 ? "hidden" : "shown"}">
+                <label for="includes-one-of-input">
+                    Includes One Of (separated by comma):
+                </label>
+                <input type="text"
+                       placeholder="REWE, Globus, Edeka, Kaufland..."
+                       value="${includesOneOf}">
+            </div>
+            <div class="form-group ${() => shownTab.value !== 1 ? "hidden" : "shown"}">
+                <label for="includes-all-of-input">
+                    Includes All Of (separated by comma):
+                </label>
+                <input type="text"
+                       placeholder="Max Mustermann, Geschenk..."
+                       value="${includesAllOf}">
+            </div>
+            <div class="form-group ${() => shownTab.value !== 2 ? "hidden" : "shown"}">
+                <label for="custom-filter-textarea">
+                    Custom Filter:
+                </label>
+                <textarea class="code"
+                          rows="12"
+                          value="${filter}"
+                          placeholder="Custom JavaScript code to filter entries...">
+                </textarea>
+            </div>
+            <div class="button-group">
+                <button type="submit">Save Category</button>
+                <button type="button" class="secondary" onclick="${close}">Cancel</button>
+            </div>
+        </form>
+    `);
 }

@@ -1,9 +1,9 @@
 import {html} from "@dobschal/html.js";
-import CategoriesModal from "./CategoriesModal.ts";
-import CategoryEditModal from "./CategoryEditModal.ts";
+import CategoriesModal from "./modals/CategoriesModal.ts";
+import CategoryEditModal from "./modals/CategoryEditModal.ts";
 import EntriesTable from "./EntriesTable.ts";
 import ImportButton from "./ImportButton.ts";
-import ImportModal from "./ImportModal.ts";
+import ImportModal from "./modals/ImportModal.ts";
 import CategoriesStats from "./Categories.ts";
 import FilterSelectors from "./FilterSelectors.ts";
 import SessionButtons from "./SessionButtons.ts";
@@ -36,11 +36,10 @@ export default function (): Array<HTMLElement> {
             ${CategoriesStats()}
             ${EntriesTable()}
         </main>
-        
+
         ${CategoriesModal()}
         ${ImportModal()}
         ${CategoryEditModal()}
-
     `;
 }
 

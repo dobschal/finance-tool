@@ -1,9 +1,10 @@
-import {ensure, type Optional, toDate} from "../lib/util.ts";
-import {type CsvColumn, CsvColumnType, type CsvModel, ingModel, postbankModel} from "../csvModels.ts";
-import {entries, entryFilter, state} from "../store.ts";
-import type {Entry} from "../types/Entry.ts";
+import {bind, ensure, type Optional, toDate} from "../../lib/util.ts";
+import {type CsvColumn, CsvColumnType, type CsvModel, ingModel, postbankModel} from "../../csvModels.ts";
+import {entries, entryFilter, state} from "../../store.ts";
+import type {Entry} from "../../types/Entry.ts";
 import {html} from "@dobschal/html.js";
-import {showToast} from "../lib/toast.ts";
+import {showToast} from "../../lib/toast.ts";
+import Modal from "./Modal.ts";
 
 // region setup
 
@@ -11,6 +12,7 @@ export default function () {
 
     let bankId = "ing";
     let file: Optional<File>;
+    const isOpen = bind(state, "isImportModalOpen");
 
     function close() {
         state.value.isImportModalOpen = false;
@@ -38,28 +40,31 @@ export default function () {
         close();
     }
 
-    return html`
-        <dialog ${() => state.value.isImportModalOpen ? "open" : ""}>
-            <form onsubmit="${onSubmit}">
-                <h2>Import Data</h2>
-                <p class="alert">
-                    The app expects german formats for dates and numbers. E.g. "31.01.2023" for dates and "1.234,56" for
-                    numbers.
-                </p>
+    const modalBody = html`
+        <form onsubmit="${onSubmit}">
+            <p class="alert">
+                The app expects german formats for dates and numbers. E.g. "31.01.2023" for dates and "1.234,56" for
+                numbers.
+            </p>
+            <div class="form-group">
                 <label for="import-bank-select">Select Institute:</label>
                 <select name="bank-select" onchange="${onSelectBank}">
                     <option value="ing" selected>ING</option>
                     <option value="postbank">Postbank</option>
                 </select>
+            </div>
+            <div class="form-group">
                 <label for="import-file-input">Select File:</label>
                 <input type="file" onchange="${onFileChange}" accept=".csv"/>
-                <div class="button-group">
-                    <button type="submit">Import</button>
-                    <button type="button" class="secondary" onclick="${close}">Cancel</button>
-                </div>
-            </form>
-        </dialog>
+            </div>
+            <div class="button-group">
+                <button type="submit">Import</button>
+                <button type="button" class="secondary" onclick="${close}">Cancel</button>
+            </div>
+        </form>
     `;
+
+    return Modal(isOpen, "Import Data", modalBody);
 }
 
 // endregion
