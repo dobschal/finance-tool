@@ -1,16 +1,16 @@
-import {html} from "@dobschal/html.js";
-import CategoriesModal from "./modals/CategoriesModal.ts";
-import CategoryEditModal from "./modals/CategoryEditModal.ts";
-import EntriesTable from "./EntriesTable.ts";
-import ImportButton from "./ImportButton.ts";
-import ImportModal from "./modals/ImportModal.ts";
-import CategoriesStats from "./Categories.ts";
-import FilterSelectors from "./FilterSelectors.ts";
-import SessionButtons from "./SessionButtons.ts";
-import SessionSelect from "./SessionSelect.ts";
+import { html } from '@dobschal/html.js'
+import CategoriesModal from './modals/CategoriesModal.ts'
+import CategoryEditModal from './modals/CategoryEditModal.ts'
+import EntriesTable from './EntriesTable.ts'
+import ImportButton from './ImportButton.ts'
+import ImportModal from './modals/ImportModal.ts'
+import CategoriesStats from './Categories.ts'
+import FilterSelectors from './FilterSelectors.ts'
+import SessionButtons from './SessionButtons.ts'
+import SessionSelect from './SessionSelect.ts'
 
 export default function (): Array<HTMLElement> {
-    return <Array<HTMLElement>>html`
+  return html`
         <nav>
             <div class="horizontal">
                 <h1>
@@ -40,7 +40,5 @@ export default function (): Array<HTMLElement> {
         ${CategoriesModal()}
         ${ImportModal()}
         ${CategoryEditModal()}
-    `;
+    ` as Array<HTMLElement>
 }
-
-

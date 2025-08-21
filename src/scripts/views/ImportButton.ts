@@ -1,13 +1,13 @@
-import {html} from "@dobschal/html.js";
-import {state} from "../store.ts";
+import { html } from '@dobschal/html.js'
+import { state } from '../store.ts'
+import type { HTML } from '../types/HTML.ts'
 
-export default function () {
+export default function (): HTML {
+  function openModal (): void {
+    state.value.isImportModalOpen = true
+  }
 
-    function openModal() {
-        state.value.isImportModalOpen = true;
-    }
-
-    return html`
+  return html`
         <button onclick="${openModal}">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                  stroke="currentColor" class="size-6">
@@ -16,5 +16,5 @@ export default function () {
             </svg>
             Import CSV
         </button>
-    `;
+    `
 }

@@ -1,0 +1,30 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": "standard-with-typescript",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "project": [
+      "tsconfig.json"
+    ]
+  },
+  "rules": {
+    "@typescript-eslint/no-implied-eval": "off",
+    "no-new-func": "off",
+    "@typescript-eslint/restrict-plus-operands": "off",
+    "@typescript-eslint/strict-boolean-expressions": "off",
+    "@typescript-eslint/array-type": [
+      "error",
+      {
+        "default": "generic"
+      }
+    ]
+  },
+  "ignorePatterns": [
+    "dist/**",
+    "vite-env.d.ts"
+  ]
+}

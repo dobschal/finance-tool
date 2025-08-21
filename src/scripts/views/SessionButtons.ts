@@ -1,56 +1,55 @@
-import {ensure} from "../lib/util.ts";
-import {getSelectedSession, loadSession, saveSession} from "../service/sessionService.ts";
-import {html} from "@dobschal/html.js";
-import {categories, entries, entryFilter, sessions, state} from "../store.ts";
+import { ensure } from '../lib/util.ts'
+import { getSelectedSession, loadSession, saveSession } from '../service/sessionService.ts'
+import { html } from '@dobschal/html.js'
+import { categories, entries, entryFilter, sessions, state } from '../store.ts'
+import type { HTML } from '../types/HTML.ts'
 
-
-export default function () {
-
-    function editSession() {
-        const session = ensure(getSelectedSession());
-        const newSessionName = prompt("Change session name:", session?.name);
-        if (!newSessionName) {
-            return;
-        }
-        session.name = newSessionName;
-        saveSession(session);
+export default function (): HTML {
+  function editSession (): void {
+    const session = ensure(getSelectedSession())
+    const newSessionName = prompt('Change session name:', session?.name)
+    if (!newSessionName) {
+      return
     }
+    session.name = newSessionName
+    saveSession(session)
+  }
 
-    function deleteSession() {
-        if (!confirm("Are you sure you want to delete this session? This cannot be undone.")) {
-            return;
-        }
-        entries.value = [];
-        categories.value = [];
-        entryFilter.value = {
-            startMonth: "01.1970",
-            endMonth: "12.3000",
-            includeEarnings: false,
-            hiddenCategories: []
-        };
-        const index = sessions.value.findIndex(session => session.id === state.value.sessionId);
-        if (index > -1) {
-            sessions.value.splice(index, 1);
-        }
-        if (sessions.value.length === 0) {
-            window.location.reload();
-        } else {
-            loadSession(sessions.value[0].id);
-        }
+  function deleteSession (): void {
+    if (!confirm('Are you sure you want to delete this session? This cannot be undone.')) {
+      return
     }
-
-    function downloadSession() {
-        const sessionData = ensure(getSelectedSession());
-        const blob = new Blob([JSON.stringify(sessionData)], {type: "application/json"});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `financial_tool_session_${new Date().toISOString().split("T")[0]}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
+    entries.value = []
+    categories.value = []
+    entryFilter.value = {
+      startMonth: '01.1970',
+      endMonth: '12.3000',
+      includeEarnings: false,
+      hiddenCategories: []
     }
+    const index = sessions.value.findIndex(session => session.id === state.value.sessionId)
+    if (index > -1) {
+      sessions.value.splice(index, 1)
+    }
+    if (sessions.value.length === 0) {
+      window.location.reload()
+    } else {
+      loadSession(sessions.value[0].id)
+    }
+  }
 
-    return html`
+  function downloadSession (): void {
+    const sessionData = ensure(getSelectedSession())
+    const blob = new Blob([JSON.stringify(sessionData)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `financial_tool_session_${new Date().toISOString().split('T')[0]}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  return html`
         <svg onclick="${editSession}" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
              stroke-width="1.5" stroke="currentColor" class="icon-button">
             <path stroke-linecap="round" stroke-linejoin="round"
@@ -67,5 +66,5 @@ export default function () {
             <path stroke-linecap="round" stroke-linejoin="round"
                   d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"/>
         </svg>
-    `;
+    `
 }

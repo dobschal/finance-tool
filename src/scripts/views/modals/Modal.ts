@@ -1,11 +1,10 @@
-import {html} from "@dobschal/html.js";
-import type {ObservableVariable} from "@dobschal/observable/Observable";
-import {onMounted, onRemoved} from "../../lib/domObserver.ts";
+import { html } from '@dobschal/html.js'
+import type { ObservableVariable } from '@dobschal/observable/Observable'
+import { onMounted, onRemoved } from '../../lib/domObserver.ts'
 
-export default function (isOpen: ObservableVariable<boolean>, title: string, content: unknown) {
-
-    const element = html`
-        <dialog ${() => isOpen.value ? "open" : ""}>
+export default function (isOpen: ObservableVariable<boolean>, title: string, content: unknown): ChildNode {
+  const element = html`
+        <dialog ${() => isOpen.value ? 'open' : ''}>
             <div class="horizontal space-between">
                 <h2>${title}</h2>
                 <svg onclick="${close}" class="icon-button" xmlns="http://www.w3.org/2000/svg" fill="none"
@@ -16,52 +15,52 @@ export default function (isOpen: ObservableVariable<boolean>, title: string, con
             </div>
             ${content}
         </dialog
-    ` as ChildNode;
+    ` as ChildNode
 
-    onMounted(element, () => {
-        document.addEventListener("keydown", catchEscapePress);
-        element.addEventListener("mousedown", onMouseDown);
-    });
+  onMounted(element, () => {
+    document.addEventListener('keydown', catchEscapePress)
+    element.addEventListener('mousedown', onMouseDown)
+  })
 
-    onRemoved(element, () => {
-        document.removeEventListener("keydown", catchEscapePress);
-        element.removeEventListener("mousedown", onMouseDown);
-    });
+  onRemoved(element, () => {
+    document.removeEventListener('keydown', catchEscapePress)
+    element.removeEventListener('mousedown', onMouseDown)
+  })
 
-    return element;
+  return element
 
-    function close() {
-        isOpen.value = false;
+  function close (): void {
+    isOpen.value = false
+  }
+
+  function catchEscapePress (e: KeyboardEvent): void {
+    if (e.key === 'Escape') {
+      console.log('Pressed escape to close modal')
+      close()
+    }
+  }
+
+  function onMouseDown (event: Event): void {
+    if (event.target !== element) return
+    event.stopPropagation()
+    let x = (event as MouseEvent).clientX
+    let y = (event as MouseEvent).clientY
+    const dialog = element as HTMLDialogElement
+    document.addEventListener('mousemove', onMouseMove)
+    document.addEventListener('mouseup', onMouseUp)
+
+    function onMouseUp (): void {
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseup', onMouseUp)
     }
 
-    function catchEscapePress(e: KeyboardEvent) {
-        if (e.key === "Escape") {
-            console.log("Pressed escape to close modal");
-            close();
-        }
+    function onMouseMove (event: Event): void {
+      const dx = (event as MouseEvent).clientX - x
+      const dy = (event as MouseEvent).clientY - y
+      dialog.style.left = (dialog.offsetLeft + dx) + 'px'
+      dialog.style.top = (dialog.offsetTop + dy) + 'px'
+      x = (event as MouseEvent).clientX
+      y = (event as MouseEvent).clientY
     }
-
-    function onMouseDown(event: Event) {
-        if (event.target !== element) return;
-        event.stopPropagation();
-        let x = (event as MouseEvent).clientX;
-        let y = (event as MouseEvent).clientY;
-        let dialog = element as HTMLDialogElement;
-        document.addEventListener("mousemove", onMouseMove);
-        document.addEventListener("mouseup", onMouseUp);
-
-        function onMouseUp() {
-            document.removeEventListener("mousemove", onMouseMove);
-            document.removeEventListener("mouseup", onMouseUp);
-        }
-
-        function onMouseMove(event: Event) {
-            let dx = (event as MouseEvent).clientX - x;
-            let dy = (event as MouseEvent).clientY - y;
-            dialog.style.left = (dialog.offsetLeft + dx) + "px";
-            dialog.style.top = (dialog.offsetTop + dy) + "px";
-            x = (event as MouseEvent).clientX;
-            y = (event as MouseEvent).clientY;
-        }
-    }
+  }
 }

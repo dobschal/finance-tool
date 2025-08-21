@@ -1,34 +1,34 @@
-import {html} from "@dobschal/html.js";
-import Checkbox from "./partials/Checkbox.ts";
-import {Computed} from "@dobschal/observable";
-import {entries, entryFilter} from "../store.ts";
-import {bind, dateStringToMonthDisplay} from "../lib/util.ts";
-import Select, {type SelectOption} from "./partials/Select.ts";
+import { html } from '@dobschal/html.js'
+import Checkbox from './partials/Checkbox.ts'
+import { Computed } from '@dobschal/observable'
+import { entries, entryFilter } from '../store.ts'
+import { bind, dateStringToMonthDisplay } from '../lib/util.ts'
+import Select, { type SelectOption } from './partials/Select.ts'
+import type { HTML } from '../types/HTML.ts'
 
-export default function () {
+export default function (): HTML {
+  const includeEarnings = bind(entryFilter, 'includeEarnings')
+  const startMonth = bind(entryFilter, 'startMonth')
+  const endMonth = bind(entryFilter, 'endMonth')
 
-    const includeEarnings = bind(entryFilter, "includeEarnings");
-    const startMonth = bind(entryFilter, "startMonth");
-    const endMonth = bind(entryFilter, "endMonth");
+  const months = Computed<Array<SelectOption>>(() => {
+    const monthsSet: Array<SelectOption> = [{
+      label: 'All',
+      value: ''
+    }]
+    entries.value.forEach(entry => {
+      const monthDisplay = dateStringToMonthDisplay(entry.date)
+      if (monthsSet.find(month => month.label === monthDisplay) == null) {
+        monthsSet.push({
+          value: entry.date.substring(3), // cut off the day --> e.g. "01.1970"
+          label: monthDisplay
+        })
+      }
+    })
+    return monthsSet
+  })
 
-    const months = Computed<Array<SelectOption>>(() => {
-        const monthsSet: Array<SelectOption> = [{
-            label: "All",
-            value: ""
-        }];
-        entries.value.forEach(entry => {
-            const monthDisplay = dateStringToMonthDisplay(entry.date);
-            if (!monthsSet.find(month => month.label === monthDisplay)) {
-                monthsSet.push({
-                    value: entry.date.substring(3), // cut off the day --> e.g. "01.1970"
-                    label: monthDisplay
-                });
-            }
-        });
-        return monthsSet;
-    });
-
-    return html`
+  return html`
         <div class="form-group">
             <div class="horizontal top">
                 <div class="card form-group">
@@ -53,6 +53,3 @@ export default function () {
         </div>
     `
 }
-
-
-

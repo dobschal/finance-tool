@@ -1,6 +1,6 @@
 export interface EntryFilter {
-    startMonth: string;
-    endMonth: string;
-    includeEarnings: boolean;
-    hiddenCategories: Array<string>;
+  startMonth: string
+  endMonth: string
+  includeEarnings: boolean
+  hiddenCategories: Array<string>
 }

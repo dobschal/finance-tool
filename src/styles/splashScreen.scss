@@ -19,7 +19,7 @@
   backdrop-filter: blur(40px);
   justify-content: center;
   align-items: center;
-  color: var(--pastel-blue-70);
+  color: var(--color-primary);
   animation: fade-in 0.3s ease-in;
   transition: background-color 0.3s ease-in-out, backdrop-filter 0.3s ease-in-out;
 }
@@ -27,8 +27,8 @@
 #splash-screen h1 {
   font-size: 3rem;
   font-weight: bold;
-  color: var(--pastel-blue-70);
-  background: -webkit-linear-gradient(150deg, var(--pastel-blue-50) 0%, var(--pastel-blue-70) 10%, var(--pastel-blue-90));
+  color: var(--color-primary);
+  background: -webkit-linear-gradient(150deg, var(--color-primary-light) 0%, var(--color-primary) 10%, var(--color-primary-dark));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   transition: opacity 0.2s ease-in-out 0.1s;

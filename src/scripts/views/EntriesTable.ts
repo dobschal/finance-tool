@@ -1,22 +1,22 @@
-import {html} from "@dobschal/html.js";
-import type {EntryDto} from "../types/Entry.ts";
-import {getEntriesWithCategories, getFilteredEntriesWithCategories} from "../service/entryService.ts";
-import {Computed} from "@dobschal/observable";
-import {entryFilter} from "../store.ts";
+import { html } from '@dobschal/html.js'
+import type { EntryDto } from '../types/Entry.ts'
+import { getEntriesWithCategories, getFilteredEntriesWithCategories } from '../service/entryService.ts'
+import { Computed } from '@dobschal/observable'
+import { entryFilter } from '../store.ts'
+import type { HTML } from '../types/HTML.ts'
 
-export default function () {
+export default function (): HTML {
+  const entries = Computed(() => getEntriesWithCategories())
+  const filteredEntries = Computed(() => getFilteredEntriesWithCategories().filter(entry => {
+    if (entryFilter.value.hiddenCategories.includes('uncategorized') && (entry.category == null)) {
+      return false
+    } else if (entry.category?.id && entryFilter.value.hiddenCategories.includes(entry.category.id)) {
+      return false
+    }
+    return true
+  }))
 
-    const entries = Computed(() => getEntriesWithCategories());
-    const filteredEntries = Computed(() => getFilteredEntriesWithCategories().filter(entry => {
-        if (entryFilter.value.hiddenCategories.includes("uncategorized") && !entry.category) {
-            return false;
-        } else if (entry.category?.id && entryFilter.value.hiddenCategories.includes(entry.category.id)) {
-            return false;
-        }
-        return true;
-    }));
-
-    return html`
+  return html`
         <div class="card">
             <div class="horizontal space-between">
                 <h2>Entries</h2>
@@ -42,17 +42,16 @@ export default function () {
                 </tbody>
             </table>
         </div>
-    `;
+    `
 }
 
-function TableEntry(entry: EntryDto) {
+function TableEntry (entry: EntryDto): HTML {
+  const style = Computed(() => {
+    if (!entry.category?.color) return ''
+    return `background-color: ${entry.category.color}`
+  })
 
-    const style = Computed(() => {
-        if (!entry.category?.color) return "";
-        return `background-color: ${entry.category.color}`;
-    });
-
-    return html`
+  return html`
         <tr style="${style}">
             <td class="date">${entry.date}</td>
             <td class="recipient">${entry.recipientSender}</td>
@@ -62,4 +61,3 @@ function TableEntry(entry: EntryDto) {
         </tr>
     `
 }
-
