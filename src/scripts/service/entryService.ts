@@ -20,6 +20,9 @@ export function getFilteredEntriesWithCategories (): Array<EntryDto> {
   const endDate = entryFilter.value.endMonth ? getLastDayOfMonth(toDate('01.' + entryFilter.value.endMonth)) : undefined
   return getEntriesWithCategories()
     .filter(entry => {
+      if (!(entryFilter.value.includeExpenses || entry.value > 0)) {
+        return false
+      }
       if (!(entryFilter.value.includeEarnings || entry.value < 0)) {
         return false
       }

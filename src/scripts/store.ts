@@ -10,6 +10,7 @@ export const entryFilter = persist<EntryFilter>('entryFilter', {
   startMonth: '01.1970',
   endMonth: '12.3000',
   includeEarnings: false,
+  includeExpenses: true,
   hiddenCategories: []
 })
 

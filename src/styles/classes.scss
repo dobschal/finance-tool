@@ -86,6 +86,10 @@
   gap: 1rem;
   align-items: center;
 
+  &:not(.wrap) {
+    overflow-y: auto;
+  }
+
   &.wrap {
     flex-wrap: wrap;
   }

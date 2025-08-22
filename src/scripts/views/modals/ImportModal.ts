@@ -40,28 +40,28 @@ export default function (): ChildNode {
   }
 
   const modalBody = html`
-        <form onsubmit="${onSubmit}">
-            <p class="alert">
-                The app expects german formats for dates and numbers. E.g. "31.01.2023" for dates and "1.234,56" for
-                numbers.
-            </p>
-            <div class="form-group">
-                <label for="import-bank-select">Select Institute:</label>
-                <select name="bank-select" onchange="${onSelectBank}">
-                    <option value="ing" selected>ING</option>
-                    <option value="postbank">Postbank</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="import-file-input">Select File:</label>
-                <input type="file" onchange="${onFileChange}" accept=".csv"/>
-            </div>
-            <div class="button-group">
-                <button type="submit">Import</button>
-                <button type="button" class="secondary" onclick="${close}">Cancel</button>
-            </div>
-        </form>
-    `
+      <form onsubmit="${onSubmit}">
+          <p class="alert">
+              The app expects german formats for dates and numbers. E.g. "31.01.2023" for dates and "1.234,56" for
+              numbers.
+          </p>
+          <div class="form-group">
+              <label for="import-bank-select">Select Institute:</label>
+              <select name="bank-select" onchange="${onSelectBank}">
+                  <option value="ing" selected>ING</option>
+                  <option value="postbank">Postbank</option>
+              </select>
+          </div>
+          <div class="form-group">
+              <label for="import-file-input">Select File:</label>
+              <input type="file" onchange="${onFileChange}" accept=".csv"/>
+          </div>
+          <div class="button-group">
+              <button type="submit">Import</button>
+              <button type="button" class="secondary" onclick="${close}">Cancel</button>
+          </div>
+      </form>
+  `
 
   return Modal(isOpen, 'Import Data', modalBody)
 }
@@ -143,6 +143,7 @@ async function importFile (file: File, bankId: string): Promise<void> {
     startMonth: '01.1970',
     endMonth: '12.3000',
     includeEarnings: false,
+    includeExpenses: true,
     hiddenCategories: []
   }
   entries.value = allEntries

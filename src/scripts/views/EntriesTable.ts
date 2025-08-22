@@ -17,32 +17,34 @@ export default function (): HTML {
   }))
 
   return html`
-        <div class="card">
-            <div class="horizontal space-between">
-                <h2>Entries</h2>
-                <small>
+      <div class="card">
+          <div class="horizontal space-between">
+              <h2>Entries</h2>
+              <small>
 
-                    ${() => filteredEntries.value.length}
-                    of
-                    ${() => entries.value.length} entries
-                </small>
-            </div>
-            <table>
-                <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Recipient/Sender</th>
-                    <th>Type</th>
-                    <th>Description</th>
-                    <th class="number">Value</th>
-                </tr>
-                </thead>
-                <tbody>
-                ${() => filteredEntries.value.map(TableEntry)}
-                </tbody>
-            </table>
-        </div>
-    `
+                  ${() => filteredEntries.value.length}
+                  of
+                  ${() => entries.value.length} entries
+              </small>
+          </div>
+          <div class="horizontal">
+              <table>
+                  <thead>
+                  <tr>
+                      <th>Date</th>
+                      <th>Recipient/Sender</th>
+                      <th>Type</th>
+                      <th>Description</th>
+                      <th class="number">Value</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  ${() => filteredEntries.value.map(TableEntry)}
+                  </tbody>
+              </table>
+          </div>
+      </div>
+  `
 }
 
 function TableEntry (entry: EntryDto): HTML {
@@ -52,12 +54,12 @@ function TableEntry (entry: EntryDto): HTML {
   })
 
   return html`
-        <tr style="${style}">
-            <td class="date">${entry.date}</td>
-            <td class="recipient">${entry.recipientSender}</td>
-            <td class="type">${entry.type}</td>
-            <td class="description">${entry.description}</td>
-            <td class="value number">${entry.valueFormatted}</td>
-        </tr>
-    `
+      <tr style="${style}">
+          <td class="date">${entry.date}</td>
+          <td class="recipient">${entry.recipientSender}</td>
+          <td class="type">${entry.type}</td>
+          <td class="description">${entry.description}</td>
+          <td class="value number">${entry.valueFormatted}</td>
+      </tr>
+  `
 }

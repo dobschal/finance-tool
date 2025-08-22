@@ -12,7 +12,6 @@
 body {
   margin: 0;
   background: -webkit-linear-gradient(150deg, var(--color-primary-light) 0%, var(--color-primary) 10%, var(--color-primary-dark));
-  min-width: 950px;
 }
 
 button {
@@ -55,7 +54,8 @@ dialog {
   border-radius: 1.5rem;
   padding: 2rem;
   box-shadow: rgb(38, 57, 77) 0 20px 30px -10px;
-  min-width: 40%;
+  width: calc(100% - 4rem);
+  max-width: 48rem;
   max-height: 90vh;
   overflow-y: auto;
   animation: fade-in 0.3s ease-out;
